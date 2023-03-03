@@ -12,6 +12,8 @@ import { unByKey } from "ol/Observable.js";
 
 const API_URL = "http://localhost:4000/cities";
 const xhr = new XMLHttpRequest();
+
+/*
 function onRequestHandler(){
   if(this.readyState == 4 && this.status == 200){
     console.log(this.response);
@@ -19,7 +21,18 @@ function onRequestHandler(){
     data.map(city => addCityFeature(city.longitude,city.latitude));
   }
 }
-
+*/
+async function onRequestHandler(){
+  if(this.readyState == 4 && this.status == 200){
+    console.log(this.response);
+    const data = JSON.parse(this.response);
+    while(true){
+      console.log('calling json map');
+      data.map(city => addCityFeature(city.longitude,city.latitude));
+      await sleep(4000);
+    }
+  }
+}
 xhr.addEventListener("load", onRequestHandler);
 xhr.open("GET",API_URL);
 xhr.send();
@@ -47,13 +60,14 @@ const map = new Map({
   }),
 });
 
+/*
 function addRandomFeature() {
   const x = Math.random() * 360 - 180;
   const y = Math.random() * 170 - 85;
   const geom = new Point(fromLonLat([x, y]));
   const feature = new Feature(geom);
   source.addFeature(feature);
-}
+}*/
 
 function addFixedFeature() {
     const x = Math.random() * 360 - 180;
@@ -104,19 +118,23 @@ source.on("addfeature", function (e) {
   flash(e.feature);
 });
 
-//window.setInterval(addRandomFeature, 1000);
-//addFixedFeature();
-//window.setInterval(addFixedFeature, 5000);
+window.setInterval(addRandomFeature, 1000);
+addFixedFeature();
+window.setInterval(addFixedFeature, 5000);
 
 function addCityFeature(longitude, latitude) {
   addFromLonLarFeature(longitude, latitude);
   window.setInterval(addFromLonLarFeature, 5000);
 }
 
-function addFromLonLatFeature(longitude, latitude) {
+function addFromLonLarFeature(longitude, latitude) {
   const x = longitude;
   const y = latitude;
   const geom = new Point(fromLonLat([x, y]));
   const feature = new Feature(geom);
   source.addFeature(feature);
+}
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
